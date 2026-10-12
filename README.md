@@ -1,6 +1,6 @@
 # Deploy and Host Lowcoder on Railway
 
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/lowcoder?utm_medium=integration&utm_source=button&utm_campaign=lowcoder)
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/new/template/lowcoder?referralCode=sLjDXb&utm_medium=integration&utm_source=button&utm_campaign=lowcoder)
 
 [Lowcoder](https://lowcoder.cloud/) is the open-source Retool alternative: build internal tools, admin panels, dashboards and customer-facing apps with a drag-and-drop editor, connect them to your databases and APIs, script them with JavaScript, and share or embed the results. This template runs the official multi-image Lowcoder build (web frontend, API service and Node service) with MongoDB and Redis, and creates your super-admin account on first boot with a generated password.
 
