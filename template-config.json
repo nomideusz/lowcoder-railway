@@ -85,6 +85,11 @@
           "description": "Super-admin password (generated). It is re-applied on every boot, so change it here, not in the UI",
           "isOptional": false
         },
+        "LOWCODER_EMAIL_AUTH_ENABLED": {
+          "defaultValue": "true",
+          "description": "Email + password sign-in. Keep true: the web UI hides the login and sign-up forms unless this is exactly true, and the super-admin signs in with it",
+          "isOptional": false
+        },
         "LOWCODER_MONGODB_URL": {
           "defaultValue": "mongodb://${{MongoDB.MONGO_INITDB_ROOT_USERNAME}}:${{MongoDB.MONGO_INITDB_ROOT_PASSWORD}}@${{MongoDB.RAILWAY_PRIVATE_DOMAIN}}:27017/lowcoder?authSource=admin",
           "description": "MongoDB on the private network",
@@ -128,6 +133,11 @@
         "LOWCODER_EMAIL_SIGNUP_ENABLED": {
           "defaultValue": "true",
           "description": "Allow new accounts to sign up with email (needed for invite links). In the default SAAS mode every sign-up gets its own isolated workspace; set false to close sign-ups",
+          "isOptional": false
+        },
+        "LOWCODER_WORKSPACE_MODE": {
+          "defaultValue": "SAAS",
+          "description": "SAAS: every sign-up gets its own workspace. ENTERPRISE: everyone joins the first workspace",
           "isOptional": false
         },
         "LOWCODER_MAX_REQUEST_SIZE": {

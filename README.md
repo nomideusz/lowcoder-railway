@@ -38,7 +38,7 @@ The stack is five services: Lowcoder (the web frontend), lowcoder-api, lowcoder-
 
 **The super-admin password is managed by the variable.** The API service re-applies `LOWCODER_SUPERUSER_PASSWORD` on every boot, so a password changed in the UI reverts on the next redeploy. To change it, edit the variable.
 
-**Sign-ups.** Email sign-up is on, as upstream ships it, because invite links need it. In the default SAAS workspace mode every person who signs up gets their own isolated workspace (they cannot see yours), but anyone who finds the URL can create one. To close the instance, set `LOWCODER_EMAIL_SIGNUP_ENABLED=false` on lowcoder-api; the super-admin can still sign in.
+**Sign-ups.** Email sign-up is on, as upstream ships it, because invite links need it. In the default SAAS workspace mode every person who signs up gets their own isolated workspace (they cannot see yours), but anyone who finds the URL can create one. To close the instance, set `LOWCODER_EMAIL_SIGNUP_ENABLED=false` on lowcoder-api; the super-admin can still sign in. To put everyone in one shared workspace instead, set `LOWCODER_WORKSPACE_MODE=ENTERPRISE`. Leave `LOWCODER_EMAIL_AUTH_ENABLED` at `true`: the web UI only shows the email login and sign-up forms when it is.
 
 **Custom domain.** Add it to the Lowcoder service, then set `LOWCODER_PUBLIC_URL` on lowcoder-api to `https://your-domain` so invite links and OAuth callbacks use it.
 
