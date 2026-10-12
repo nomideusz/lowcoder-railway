@@ -1,0 +1,294 @@
+{
+  "services": {
+    "c51cefc7-bf1a-41b6-bb84-dc535ea47121": {
+      "icon": "https://raw.githubusercontent.com/nomideusz/lowcoder-railway/main/icon.svg",
+      "name": "Lowcoder",
+      "build": {},
+      "deploy": {
+        "startCommand": "/bin/sh -c \"grep -q '^resolver' /etc/nginx/server.conf || { R=$(awk '/^nameserver/{print $2; exit}' /etc/resolv.conf); case $R in *:*) R=[$R];; esac; sed -i -e '1i resolver '$R' valid=10s;' -e 's#proxy_pass __LOWCODER_API_SERVICE_URL__;#set $lc_up __LOWCODER_API_SERVICE_URL__; proxy_pass $lc_up;#' -e 's#proxy_pass __LOWCODER_NODE_SERVICE_URL__;#set $lc_up __LOWCODER_NODE_SERVICE_URL__; proxy_pass $lc_up;#' /etc/nginx/server.conf; }; exec /docker-entrypoint.sh nginx -g 'daemon off;'\"",
+        "healthcheckPath": "/",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "lowcoderorg/lowcoder-ce-frontend:2.7.6"
+      },
+      "networking": {
+        "serviceDomains": {
+          "<hasDomain>": {}
+        }
+      },
+      "volumeMounts": {},
+      "variables": {
+        "PORT": {
+          "defaultValue": "3000",
+          "description": "Port the Lowcoder web server (nginx) listens on - leave as is",
+          "isOptional": false
+        },
+        "LOWCODER_API_SERVICE_URL": {
+          "defaultValue": "http://${{lowcoder-api.RAILWAY_PRIVATE_DOMAIN}}:8080",
+          "description": "API service on the private network (nginx proxies /api here)",
+          "isOptional": false
+        },
+        "LOWCODER_NODE_SERVICE_URL": {
+          "defaultValue": "http://${{lowcoder-node.RAILWAY_PRIVATE_DOMAIN}}:6060",
+          "description": "Node service on the private network",
+          "isOptional": false
+        },
+        "LOWCODER_MAX_REQUEST_SIZE": {
+          "defaultValue": "20m",
+          "description": "Max upload / request size - keep in sync with the API service",
+          "isOptional": false
+        },
+        "LOWCODER_MAX_QUERY_TIMEOUT": {
+          "defaultValue": "120",
+          "description": "Proxy timeout in seconds for long-running queries",
+          "isOptional": false
+        }
+      }
+    },
+    "84fc5da9-4ff4-4398-b432-42e2d1da13da": {
+      "icon": "https://raw.githubusercontent.com/nomideusz/lowcoder-railway/main/icon.svg",
+      "name": "lowcoder-api",
+      "build": {},
+      "deploy": {
+        "startCommand": null,
+        "healthcheckPath": "/api/status/health",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "lowcoderorg/lowcoder-ce-api-service:2.7.6"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {},
+      "variables": {
+        "PORT": {
+          "defaultValue": "8080",
+          "description": "Port the API service listens on - leave as is",
+          "isOptional": false
+        },
+        "LOWCODER_PUBLIC_URL": {
+          "defaultValue": "https://${{Lowcoder.RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public URL of Lowcoder (invite links, emails, OAuth callbacks) - set it to your custom domain after adding one",
+          "isOptional": false
+        },
+        "LOWCODER_SUPERUSER_USERNAME": {
+          "defaultValue": "",
+          "description": "Your email - the super-admin login, created on first boot",
+          "isOptional": false
+        },
+        "LOWCODER_SUPERUSER_PASSWORD": {
+          "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Super-admin password (generated). It is re-applied on every boot, so change it here, not in the UI",
+          "isOptional": false
+        },
+        "LOWCODER_MONGODB_URL": {
+          "defaultValue": "mongodb://${{MongoDB.MONGO_INITDB_ROOT_USERNAME}}:${{MongoDB.MONGO_INITDB_ROOT_PASSWORD}}@${{MongoDB.RAILWAY_PRIVATE_DOMAIN}}:27017/lowcoder?authSource=admin",
+          "description": "MongoDB on the private network",
+          "isOptional": false
+        },
+        "LOWCODER_REDIS_URL": {
+          "defaultValue": "redis://default:${{Redis.REDIS_PASSWORD}}@${{Redis.RAILWAY_PRIVATE_DOMAIN}}:6379",
+          "description": "Redis on the private network",
+          "isOptional": false
+        },
+        "LOWCODER_NODE_SERVICE_URL": {
+          "defaultValue": "http://${{lowcoder-node.RAILWAY_PRIVATE_DOMAIN}}:6060",
+          "description": "Node service (JS execution and data source plugins) on the private network",
+          "isOptional": false
+        },
+        "LOWCODER_NODE_SERVICE_SECRET": {
+          "defaultValue": "${{lowcoder-node.LOWCODER_NODE_SERVICE_SECRET}}",
+          "description": "Shared with the Node service - encrypts data source configs passed to it",
+          "isOptional": false
+        },
+        "LOWCODER_NODE_SERVICE_SECRET_SALT": {
+          "defaultValue": "${{lowcoder-node.LOWCODER_NODE_SERVICE_SECRET_SALT}}",
+          "description": "Shared with the Node service",
+          "isOptional": false
+        },
+        "LOWCODER_DB_ENCRYPTION_PASSWORD": {
+          "defaultValue": "${{secret(48, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Encrypts data source credentials stored in MongoDB. BACK IT UP - changing it makes saved credentials unreadable",
+          "isOptional": false
+        },
+        "LOWCODER_DB_ENCRYPTION_SALT": {
+          "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Salt for the database encryption above - never change it after first boot",
+          "isOptional": false
+        },
+        "LOWCODER_API_KEY_SECRET": {
+          "defaultValue": "${{secret(64, \"0123456789abcdef\")}}",
+          "description": "Signs personal API keys - changing it invalidates every key",
+          "isOptional": false
+        },
+        "LOWCODER_EMAIL_SIGNUP_ENABLED": {
+          "defaultValue": "true",
+          "description": "Allow new accounts to sign up with email (needed for invite links). In the default SAAS mode every sign-up gets its own isolated workspace; set false to close sign-ups",
+          "isOptional": false
+        },
+        "LOWCODER_MAX_REQUEST_SIZE": {
+          "defaultValue": "20m",
+          "description": "Max upload / query request and response size",
+          "isOptional": false
+        },
+        "JAVA_OPTS": {
+          "defaultValue": "-Xms64m -Xmx256m -XX:MaxMetaspaceSize=160m -XX:ReservedCodeCacheSize=48m -XX:TieredStopAtLevel=1 -XX:MaxDirectMemorySize=64m -Xss512k -XX:+UseSerialGC",
+          "description": "JVM memory caps so the API service fits in 512 MB (Trial). On Hobby you can raise -Xmx (e.g. 768m) for large query results and drop TieredStopAtLevel=1 for full JIT",
+          "isOptional": false
+        },
+        "MALLOC_ARENA_MAX": {
+          "defaultValue": "2",
+          "description": "Limits glibc malloc arenas - keeps the JVM's native memory small",
+          "isOptional": false
+        },
+        "RAILWAY_HEALTHCHECK_TIMEOUT_SEC": {
+          "defaultValue": "600",
+          "description": "First boot runs the MongoDB migrations before the health check can pass",
+          "isOptional": false
+        },
+        "LOWCODER_ADMIN_SMTP_HOST": {
+          "defaultValue": "",
+          "description": "Optional SMTP server for invitation and password-reset emails (Railway allows outbound SMTP on Pro only)",
+          "isOptional": true
+        },
+        "LOWCODER_ADMIN_SMTP_PORT": {
+          "defaultValue": "587",
+          "description": "SMTP port",
+          "isOptional": true
+        },
+        "LOWCODER_ADMIN_SMTP_USERNAME": {
+          "defaultValue": "",
+          "description": "SMTP username",
+          "isOptional": true
+        },
+        "LOWCODER_ADMIN_SMTP_PASSWORD": {
+          "defaultValue": "",
+          "description": "SMTP password",
+          "isOptional": true
+        },
+        "LOWCODER_EMAIL_NOTIFICATIONS_SENDER": {
+          "defaultValue": "",
+          "description": "Sender address for Lowcoder emails",
+          "isOptional": true
+        }
+      }
+    },
+    "5c578a3f-723d-4b17-9c73-ae1e4c18e979": {
+      "icon": "https://raw.githubusercontent.com/nomideusz/lowcoder-railway/main/icon.svg",
+      "name": "lowcoder-node",
+      "build": {},
+      "deploy": {
+        "startCommand": "/bin/sh -c \"cd /lowcoder/node-service/app && exec gosu lowcoder node ./build/server.js\"",
+        "healthcheckPath": "/",
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "lowcoderorg/lowcoder-ce-node-service:2.7.6"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {},
+      "variables": {
+        "PORT": {
+          "defaultValue": "6060",
+          "description": "Port the Node service listens on - leave as is",
+          "isOptional": false
+        },
+        "API_HOST": {
+          "defaultValue": "http://${{lowcoder-api.RAILWAY_PRIVATE_DOMAIN}}:8080",
+          "description": "API service on the private network",
+          "isOptional": false
+        },
+        "NODE_OPTIONS": {
+          "defaultValue": "--max-old-space-size=384",
+          "description": "Node heap cap - the bundled data source plugins need about 300 MB at boot",
+          "isOptional": false
+        },
+        "LOWCODER_NODE_SERVICE_SECRET": {
+          "defaultValue": "${{secret(64, \"0123456789abcdef\")}}",
+          "description": "Encrypts data source configs exchanged with the API service (generated)",
+          "isOptional": false
+        },
+        "LOWCODER_NODE_SERVICE_SECRET_SALT": {
+          "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Salt for the secret above (generated)",
+          "isOptional": false
+        }
+      }
+    },
+    "910c7225-ae68-46a4-a670-276bf7a739dc": {
+      "icon": "https://devicons.railway.app/i/mongodb.svg",
+      "name": "MongoDB",
+      "build": {},
+      "deploy": {
+        "startCommand": "docker-entrypoint.sh mongod --bind_ip_all --ipv6 --wiredTigerCacheSizeGB 0.25",
+        "healthcheckPath": null,
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "mongo:7.0.43"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {
+        "ff3af33a-9898-4b1a-b0a6-e5ed4b630180": {
+          "mountPath": "/data/db"
+        }
+      },
+      "variables": {
+        "MONGO_INITDB_ROOT_USERNAME": {
+          "defaultValue": "lowcoder",
+          "description": "MongoDB root user",
+          "isOptional": false
+        },
+        "MONGO_INITDB_ROOT_PASSWORD": {
+          "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Auto-generated MongoDB root password",
+          "isOptional": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Time for MongoDB to shut down cleanly on redeploy",
+          "isOptional": false
+        }
+      }
+    },
+    "0e5119ca-f9d7-434a-8b07-85719b7b6a56": {
+      "icon": "https://devicons.railway.app/i/redis.svg",
+      "name": "Redis",
+      "build": {},
+      "deploy": {
+        "startCommand": "/bin/sh -c \"chown -R redis:redis /data && exec docker-entrypoint.sh redis-server --requirepass $REDIS_PASSWORD --appendonly yes\"",
+        "healthcheckPath": null,
+        "restartPolicyType": "ON_FAILURE",
+        "restartPolicyMaxRetries": 10
+      },
+      "source": {
+        "image": "redis:8.10.2-alpine"
+      },
+      "networking": {
+        "serviceDomains": {}
+      },
+      "volumeMounts": {
+        "482b05f3-75b5-4ccf-969b-5456cd7296c0": {
+          "mountPath": "/data"
+        }
+      },
+      "variables": {
+        "REDIS_PASSWORD": {
+          "defaultValue": "${{secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Auto-generated Redis password",
+          "isOptional": false
+        }
+      }
+    }
+  }
+}
