@@ -1,7 +1,7 @@
 {
   "services": {
     "c51cefc7-bf1a-41b6-bb84-dc535ea47121": {
-      "icon": "https://raw.githubusercontent.com/nomideusz/lowcoder-railway/main/icon.svg",
+      "icon": "https://raw.githubusercontent.com/two-workspaces/lowcoder/main/icon.svg",
       "name": "Lowcoder",
       "build": {},
       "deploy": {
@@ -48,7 +48,7 @@
       }
     },
     "84fc5da9-4ff4-4398-b432-42e2d1da13da": {
-      "icon": "https://raw.githubusercontent.com/nomideusz/lowcoder-railway/main/icon.svg",
+      "icon": "https://raw.githubusercontent.com/two-workspaces/lowcoder/main/icon.svg",
       "name": "lowcoder-api",
       "build": {},
       "deploy": {
@@ -188,7 +188,7 @@
       }
     },
     "5c578a3f-723d-4b17-9c73-ae1e4c18e979": {
-      "icon": "https://raw.githubusercontent.com/nomideusz/lowcoder-railway/main/icon.svg",
+      "icon": "https://raw.githubusercontent.com/two-workspaces/lowcoder/main/icon.svg",
       "name": "lowcoder-node",
       "build": {},
       "deploy": {

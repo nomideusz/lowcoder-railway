@@ -3,7 +3,7 @@
   "short_name": "Lowcoder",
   "description": "Drag-and-drop internal tools, admin panels and dashboards, self-hosted",
   "category": "Other",
-  "image": "https://raw.githubusercontent.com/nomideusz/lowcoder-railway/main/icon.svg",
+  "image": "https://raw.githubusercontent.com/two-workspaces/lowcoder/main/icon.svg",
   "card_desc": "Lowcoder: the open-source Retool alternative. Build internal tools, admin panels and dashboards on your databases and APIs with a drag-and-drop editor, on MongoDB and Redis.",
   "deploy_marker": "lowcoderorg/lowcoder-ce-frontend:2.7.6",
   "id": "3d34edaf-f313-48fa-9b28-be4abb049a27",

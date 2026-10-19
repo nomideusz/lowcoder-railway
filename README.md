@@ -30,7 +30,7 @@ The stack is five services: Lowcoder (the web frontend), lowcoder-api, lowcoder-
 
 - [Lowcoder documentation](https://docs.lowcoder.cloud/)
 - [Lowcoder on GitHub](https://github.com/lowcoder-org/lowcoder)
-- [Template source on GitHub](https://github.com/nomideusz/lowcoder-railway)
+- [Template source on GitHub](https://github.com/two-workspaces/lowcoder)
 
 ### Implementation Details
 
